@@ -57,8 +57,8 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 const channels = [
   { id: '1', name: '3A' },
   { id: '2', name: 'Latinistes' },
-  { id: '3', name: 'LCE Espagnol LV1' },
-  { id: '4', name: 'Annonces' },
+  { id: '3', name: 'LCE' },
+  { id: '4', name: 'Espagnol LV1' },
 ];
 
 const directMessages: any[] = [];
@@ -135,7 +135,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   
   const pathSegments = pathname.split('/').filter(Boolean);
-  const activeId = pathSegments.length > 2 ? decodeURIComponent(pathSegments[pathSegments.length - 1]) : '3A';
+  const activeId = pathSegments.length > 2 ? decodeURIComponent(pathSegments[pathSegments.length - 1]) : 'Annonces';
   
   return (
     <SidebarProvider>
@@ -149,6 +149,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <SidebarContent>
           <SidebarMenu>
             <SidebarGroup>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild tooltip="Annonces" isActive={"Annonces" === activeId} className="font-semibold">
+                        <Link href={`/dashboard/channel/Annonces`}>
+                            <Hash />
+                            <span>Annonces</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
                 <Collapsible defaultOpen>
                     <CollapsibleTrigger className="w-full">
                         <SidebarGroupLabel className="w-full justify-between">
