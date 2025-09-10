@@ -132,15 +132,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarGroupLabel>Channels</SidebarGroupLabel>
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <Link href="/dashboard" passHref legacyBehavior>
-                    <SidebarMenuButton as="a" tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
+                  <SidebarMenuButton asChild tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
+                    <Link href="/dashboard">
                         <Hash />
                         <span>{channel.name}</span>
                         {channel.unread && (
                           <Badge className="ml-auto">{channel.unread}</Badge>
                         )}
-                    </SidebarMenuButton>
-                  </Link>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarGroup>
