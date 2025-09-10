@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
   Bell,
   BookOpenCheck,
+  ChevronDown,
   Hash,
   MessageCircle,
   Search,
@@ -51,6 +52,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { placeholderImages } from '@/lib/placeholder-images';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 
 const channels = [
   { id: '1', name: '3A' },
@@ -147,48 +149,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <SidebarContent>
           <SidebarMenu>
             <SidebarGroup>
-              <SidebarGroupLabel>Channels</SidebarGroupLabel>
-              {channels.map((channel) => (
-                <SidebarMenuItem key={channel.id}>
-                  <Link href={`/dashboard/channel/${channel.name}`} passHref legacyBehavior>
-                    <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeId}>
-                        <a>
-                          <Hash />
-                          <span>{channel.name}</span>
-                          {channel.unread && (
-                            <Badge className="ml-auto">{channel.unread}</Badge>
-                          )}
-                        </a>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
-              ))}
+                <Collapsible defaultOpen>
+                    <CollapsibleTrigger className="w-full">
+                        <SidebarGroupLabel className="w-full justify-between">
+                            Channels
+                            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 [&[data-state=open]]:rotate-180" />
+                        </SidebarGroupLabel>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        {channels.map((channel) => (
+                            <SidebarMenuItem key={channel.id}>
+                                <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeId}>
+                                    <Link href={`/dashboard/channel/${channel.name}`}>
+                                        <Hash />
+                                        <span>{channel.name}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </CollapsibleContent>
+                </Collapsible>
             </SidebarGroup>
             <SidebarGroup>
-              <SidebarGroupLabel>Direct Messages</SidebarGroupLabel>
-              {directMessages.map((dm) => {
-                const avatar = placeholderImages.find(p => p.id === dm.avatarId);
-                return (
-                  <SidebarMenuItem key={dm.id}>
-                    <Link href={`/dashboard/dm/${dm.id}`} passHref legacyBehavior>
-                      <SidebarMenuButton asChild tooltip={dm.name} isActive={dm.id === activeId}>
-                        <a>
-                          <div className="relative">
-                            <Avatar className="h-6 w-6">
-                              {avatar && <AvatarImage src={avatar.imageUrl} alt={dm.name} />}
-                              <AvatarFallback>{dm.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            {dm.online && (
-                              <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-2 ring-sidebar" />
-                            )}
-                          </div>
-                          <span>{dm.name}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </Link>
-                  </SidebarMenuItem>
-                )
-              })}
+                <Collapsible defaultOpen>
+                    <CollapsibleTrigger className="w-full">
+                        <SidebarGroupLabel className="w-full justify-between">
+                            Direct Messages
+                            <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 [&[data-state=open]]:rotate-180" />
+                        </SidebarGroupLabel>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        {directMessages.map((dm) => {
+                            const avatar = placeholderImages.find(p => p.id === dm.avatarId);
+                            return (
+                                <SidebarMenuItem key={dm.id}>
+                                    <SidebarMenuButton asChild tooltip={dm.name} isActive={dm.id === activeId}>
+                                        <Link href={`/dashboard/dm/${dm.id}`}>
+                                            <div className="relative">
+                                                <Avatar className="h-6 w-6">
+                                                {avatar && <AvatarImage src={avatar.imageUrl} alt={dm.name} />}
+                                                <AvatarFallback>{dm.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                                {dm.online && (
+                                                <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-2 ring-sidebar" />
+                                                )}
+                                            </div>
+                                            <span>{dm.name}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            )
+                        })}
+                    </CollapsibleContent>
+                </Collapsible>
             </SidebarGroup>
           </SidebarMenu>
         </SidebarContent>
