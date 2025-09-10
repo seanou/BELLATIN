@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { placeholderImages } from "@/lib/placeholder-images";
-import { Paperclip, SendHorizonal, Lock, Unlock } from "lucide-react";
+import { Paperclip, SendHorizonal, Lock, Unlock, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const messages: any[] = [];
@@ -66,6 +66,10 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
     setInputValue("");
   };
 
+  const handleDelete = (messageId: number) => {
+    setMessages(messages.filter(message => message.id !== messageId));
+  };
+
   const isInputDisabled = channelName === "Annonces" && isAnnoncesLocked;
   const inputPlaceholder = isInputDisabled
     ? "Enter authorization code..."
@@ -85,12 +89,23 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
             }
             const avatar = placeholderImages.find(p => p.id === message.avatarId);
             return (
-              <div key={message.id} className={`flex items-end gap-3 ${message.isCurrentUser ? 'justify-end' : ''}`}>
+              <div key={message.id} className={`group flex items-end gap-3 ${message.isCurrentUser ? 'justify-end' : ''}`}>
                 {!message.isCurrentUser && (
                   <Avatar className="h-9 w-9">
                     {avatar && <AvatarImage src={avatar.imageUrl} alt={message.user} />}
                     <AvatarFallback>{message.user.charAt(0)}</AvatarFallback>
                   </Avatar>
+                )}
+                 {message.isCurrentUser && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDelete(message.id)}
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete message</span>
+                    </Button>
                 )}
                 <div className={`rounded-lg p-3 max-w-xs lg:max-w-md shadow-sm ${message.isCurrentUser ? 'bg-primary text-primary-foreground rounded-br-none' : 'bg-card border rounded-bl-none'}`}>
                   {!message.isCurrentUser && <p className="font-semibold text-sm mb-1 text-primary">{message.user}</p>}
