@@ -2,6 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { placeholderImages } from "@/lib/placeholder-images";
 import { Paperclip, SendHorizonal } from "lucide-react";
 
@@ -108,10 +109,15 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
         <form className="relative">
           <Input placeholder="Type a message..." className="pr-24 h-11" />
           <div className="absolute inset-y-0 right-2 flex items-center">
-            <Button type="button" variant="ghost" size="icon">
-              <Paperclip className="w-5 h-5 text-muted-foreground" />
-              <span className="sr-only">Attach file</span>
-            </Button>
+            <Label htmlFor="file-upload" className="cursor-pointer">
+              <Button type="button" variant="ghost" size="icon" asChild>
+                <div>
+                  <Paperclip className="w-5 h-5 text-muted-foreground" />
+                  <span className="sr-only">Attach file</span>
+                </div>
+              </Button>
+            </Label>
+            <Input id="file-upload" type="file" className="hidden" />
             <Button type="submit" variant="ghost" size="icon">
               <SendHorizonal className="w-5 h-5 text-muted-foreground" />
               <span className="sr-only">Send message</span>
