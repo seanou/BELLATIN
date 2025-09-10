@@ -132,15 +132,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarGroupLabel>Channels</SidebarGroupLabel>
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <SidebarMenuButton asChild tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
-                    <Link href="/dashboard">
-                        <Hash />
-                        <span>{channel.name}</span>
-                        {channel.unread && (
-                          <Badge className="ml-auto">{channel.unread}</Badge>
-                        )}
-                    </Link>
-                  </SidebarMenuButton>
+                  <Link href="/dashboard" passHref>
+                    <SidebarMenuButton asChild tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
+                        <a>
+                          <Hash />
+                          <span>{channel.name}</span>
+                          {channel.unread && (
+                            <Badge className="ml-auto">{channel.unread}</Badge>
+                          )}
+                        </a>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               ))}
             </SidebarGroup>
@@ -213,7 +215,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="#">Channels</Link>
+                  <Link href="/dashboard">Channels</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
