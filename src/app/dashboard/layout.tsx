@@ -51,7 +51,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { placeholderImages } from '@/lib/placeholder-images';
-import { ChatView } from '@/components/chat/chat-view';
 
 const channels = [
   { id: '1', name: 'general', unread: 3 },
@@ -110,14 +109,36 @@ function NotificationsPopover() {
   );
 }
 
+function BreadcrumbCurrentPage() {
+  const pathname = usePathname();
+  const pathSegments = pathname.split('/').filter(Boolean);
+
+  if (pathSegments.includes('profile')) {
+    return <BreadcrumbPage>Profile</BreadcrumbPage>;
+  }
+
+  if (pathSegments.includes('channel')) {
+    const channelName = pathSegments[pathSegments.length - 1];
+    return <BreadcrumbPage>#{channelName}</BreadcrumbPage>;
+  }
+
+  if (pathSegments.includes('dm')) {
+    const dmId = pathSegments[pathSegments.length - 1];
+    const dmUser = directMessages.find(dm => dm.id === dmId);
+    return <BreadcrumbPage>{dmUser ? dmUser.name : 'Direct Message'}</BreadcrumbPage>;
+  }
+
+  return <BreadcrumbPage>Dashboard</BreadcrumbPage>;
+}
+
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const myAvatar = placeholderImages.find((img) => img.id === 'my-avatar');
   const pathname = usePathname();
   
   const pathSegments = pathname.split('/').filter(Boolean);
-  const isProfilePage = pathSegments.includes('profile');
-  const activeChannel = !isProfilePage && pathSegments.length > 1 ? pathSegments[pathSegments.length -1] : 'general';
-
+  const activeId = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : 'general';
+  
   return (
     <SidebarProvider>
       <Sidebar>
@@ -134,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
                   <Link href={`/dashboard/channel/${channel.name}`} passHref legacyBehavior>
-                    <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeChannel && !isProfilePage}>
+                    <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeId}>
                         <a>
                           <Hash />
                           <span>{channel.name}</span>
@@ -153,18 +174,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 const avatar = placeholderImages.find(p => p.id === dm.avatarId);
                 return (
                   <SidebarMenuItem key={dm.id}>
-                    <SidebarMenuButton tooltip={dm.name}>
-                      <div className="relative">
-                        <Avatar className="h-6 w-6">
-                          {avatar && <AvatarImage src={avatar.imageUrl} alt={dm.name} />}
-                          <AvatarFallback>{dm.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        {dm.online && (
-                          <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-2 ring-sidebar" />
-                        )}
-                      </div>
-                      <span>{dm.name}</span>
-                    </SidebarMenuButton>
+                    <Link href={`/dashboard/dm/${dm.id}`} passHref legacyBehavior>
+                      <SidebarMenuButton asChild tooltip={dm.name} isActive={dm.id === activeId}>
+                        <a>
+                          <div className="relative">
+                            <Avatar className="h-6 w-6">
+                              {avatar && <AvatarImage src={avatar.imageUrl} alt={dm.name} />}
+                              <AvatarFallback>{dm.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            {dm.online && (
+                              <span className="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-2 ring-sidebar" />
+                            )}
+                          </div>
+                          <span>{dm.name}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </Link>
                   </SidebarMenuItem>
                 )
               })}
@@ -221,11 +246,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                 {isProfilePage ? (
-                  <BreadcrumbPage>Profile</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbPage>#{activeChannel}</BreadcrumbPage>
-                )}
+                 <BreadcrumbCurrentPage />
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>

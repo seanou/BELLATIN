@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,12 +48,12 @@ const messages = [
     },
 ];
 
-export function ChatView({ channelName }: { channelName?: string }) {
+export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: boolean }) {
   // In a real app, you would fetch messages for the given channelName
   // For now, we'll just display a welcome message.
 
   const welcomeMessage = channelName 
-    ? `Welcome to #${channelName}.`
+    ? `This is the beginning of your conversation with ${isDM ? '' : '#'}${channelName}.`
     : "Select a channel to start chatting.";
   
   const allMessages = [
