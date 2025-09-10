@@ -113,10 +113,10 @@ function NotificationsPopover() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const myAvatar = placeholderImages.find((img) => img.id === 'my-avatar');
   const pathname = usePathname();
-  const [activeChannel, setActiveChannel] = React.useState('general');
-
-  const onProfilePage = pathname === '/dashboard/profile';
-
+  
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const isProfilePage = pathSegments.includes('profile');
+  const activeChannel = !isProfilePage && pathSegments.length > 1 ? pathSegments[pathSegments.length -1] : 'general';
 
   return (
     <SidebarProvider>
@@ -133,8 +133,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarGroupLabel>Channels</SidebarGroupLabel>
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <Link href="/dashboard" passHref legacyBehavior>
-                    <SidebarMenuButton asChild tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
+                  <Link href={`/dashboard/channel/${channel.name}`} passHref legacyBehavior>
+                    <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeChannel && !isProfilePage}>
                         <a>
                           <Hash />
                           <span>{channel.name}</span>
@@ -216,12 +216,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/dashboard">Channels</Link>
+                  <Link href="/dashboard">Dashboard</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                 {onProfilePage ? (
+                 {isProfilePage ? (
                   <BreadcrumbPage>Profile</BreadcrumbPage>
                 ) : (
                   <BreadcrumbPage>#{activeChannel}</BreadcrumbPage>
@@ -240,7 +240,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NotificationsPopover />
         </header>
         <main className="flex flex-1 flex-col">
-          {onProfilePage ? children : <ChatView key={activeChannel} channelName={activeChannel} />}
+          {children}
         </main>
       </SidebarInset>
     </SidebarProvider>
