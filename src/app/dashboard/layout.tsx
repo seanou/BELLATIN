@@ -61,9 +61,17 @@ const channels = [
   { id: '4', name: 'Espagnol LV1' },
 ];
 
-const directMessages: any[] = [];
+const directMessages = [
+  { id: 'user1', name: 'Alice Johnson', avatarId: 'avatar1', online: true },
+  { id: 'user2', name: 'Bob Williams', avatarId: 'avatar2', online: false },
+  { id: 'user3', name: 'Charlie Brown', avatarId: 'avatar3', online: true },
+  { id: 'user4', name: 'Diana Miller', avatarId: 'avatar4', online: false },
+];
 
-const notifications: any[] = [];
+const notifications = [
+    { user: 'Alice Johnson', channel: '#3A', message: 'Hey, are we still on for the project meeting?' },
+    { user: 'Admin', channel: '#Annonces', message: 'Reminder: School-wide assembly tomorrow at 10 AM.' },
+];
 
 function NotificationsPopover() {
   return (
@@ -133,9 +141,18 @@ function BreadcrumbCurrentPage() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const myAvatar = placeholderImages.find((img) => img.id === 'my-avatar');
   const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = React.useState('');
   
   const pathSegments = pathname.split('/').filter(Boolean);
   const activeId = pathSegments.length > 2 ? decodeURIComponent(pathSegments[pathSegments.length - 1]) : 'Annonces';
+
+  const filteredChannels = channels.filter(channel =>
+    channel.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredDirectMessages = directMessages.filter(dm =>
+    dm.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   
   return (
     <SidebarProvider>
@@ -165,7 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </SidebarGroupLabel>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                        {channels.map((channel) => (
+                        {filteredChannels.map((channel) => (
                             <SidebarMenuItem key={channel.id}>
                                 <SidebarMenuButton asChild tooltip={channel.name} isActive={channel.name === activeId}>
                                     <Link href={`/dashboard/channel/${channel.name}`}>
@@ -187,7 +204,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </SidebarGroupLabel>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                        {directMessages.map((dm) => {
+                        {filteredDirectMessages.map((dm) => {
                             const avatar = placeholderImages.find(p => p.id === dm.avatarId);
                             return (
                                 <SidebarMenuItem key={dm.id}>
@@ -273,6 +290,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               type="search"
               placeholder="Search..."
               className="w-full rounded-lg bg-secondary pl-8 md:w-[200px] lg:w-[320px] focus:bg-background"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <NotificationsPopover />
