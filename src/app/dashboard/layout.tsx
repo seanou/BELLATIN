@@ -1,3 +1,6 @@
+
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -107,6 +110,7 @@ function NotificationsPopover() {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const myAvatar = placeholderImages.find((img) => img.id === 'my-avatar');
+  const [activeChannel, setActiveChannel] = React.useState('general');
 
   return (
     <SidebarProvider>
@@ -123,7 +127,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarGroupLabel>Channels</SidebarGroupLabel>
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <SidebarMenuButton tooltip={channel.name} isActive={channel.name === 'general'}>
+                  <SidebarMenuButton tooltip={channel.name} isActive={channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
                     <Hash />
                     <span>{channel.name}</span>
                     {channel.unread && (
@@ -207,7 +211,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>#general</BreadcrumbPage>
+                <BreadcrumbPage>#{activeChannel}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
