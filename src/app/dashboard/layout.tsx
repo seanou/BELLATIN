@@ -51,6 +51,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { placeholderImages } from '@/lib/placeholder-images';
+import { ChatView } from '@/components/chat/chat-view';
 
 const channels = [
   { id: '1', name: 'general', unread: 3 },
@@ -132,7 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <SidebarGroupLabel>Channels</SidebarGroupLabel>
               {channels.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <Link href="/dashboard" passHref>
+                  <Link href="/dashboard" passHref legacyBehavior>
                     <SidebarMenuButton asChild tooltip={channel.name} isActive={!onProfilePage && channel.name === activeChannel} onClick={() => setActiveChannel(channel.name)}>
                         <a>
                           <Hash />
@@ -239,7 +240,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NotificationsPopover />
         </header>
         <main className="flex flex-1 flex-col">
-          {children}
+          {onProfilePage ? children : <ChatView key={activeChannel} channelName={activeChannel} />}
         </main>
       </SidebarInset>
     </SidebarProvider>

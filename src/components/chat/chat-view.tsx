@@ -47,11 +47,38 @@ const messages = [
     },
 ];
 
-export function ChatView() {
+export function ChatView({ channelName }: { channelName?: string }) {
+  // In a real app, you would fetch messages for the given channelName
+  // For now, we'll just display a welcome message.
+
+  const welcomeMessage = channelName 
+    ? `Welcome to #${channelName}.`
+    : "Select a channel to start chatting.";
+  
+  const allMessages = [
+    {
+      id: 0,
+      user: "System",
+      avatarId: "",
+      text: welcomeMessage,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isCurrentUser: false,
+      isSystem: true,
+    },
+    ...messages
+  ];
+
   return (
     <div className="flex flex-col h-[calc(100vh-theme(spacing.14))]">
       <div className="flex-1 overflow-y-auto p-4 space-y-6 sm:p-6">
-        {messages.map((message) => {
+        {allMessages.map((message) => {
+            if (message.isSystem) {
+                return (
+                    <div key={message.id} className="text-center text-sm text-muted-foreground my-4">
+                        <p>{message.text}</p>
+                    </div>
+                )
+            }
             const avatar = placeholderImages.find(p => p.id === message.avatarId);
             return (
               <div key={message.id} className={`flex items-end gap-3 ${message.isCurrentUser ? 'justify-end' : ''}`}>
