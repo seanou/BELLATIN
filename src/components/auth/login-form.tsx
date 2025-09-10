@@ -105,7 +105,7 @@ export function LoginForm() {
                   href="#"
                   className="ml-auto inline-block text-sm underline"
                 >
-                  Forgot your password?
+                  Mot de passe oublié ?
                 </Link>
               </div>
               <FormControl>
@@ -116,7 +116,7 @@ export function LoginForm() {
           )}
         />
         <Button type="submit" className="w-full">
-          Login
+          Se connecter
         </Button>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -124,12 +124,12 @@ export function LoginForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
+              Ou continuer avec
             </span>
           </div>
         </div>
         <Button variant="outline" className="w-full">
-          Sign up with Google
+          S'inscrire avec Google
         </Button>
       </form>
     </Form>
