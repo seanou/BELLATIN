@@ -128,7 +128,7 @@ export function LoginForm() {
             </span>
           </div>
         </div>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" type="button">
           S'inscrire avec Google
         </Button>
       </form>
