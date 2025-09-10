@@ -19,10 +19,16 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  password: z.string(),
+  firstName: z.string().min(1, { message: "First name is required." }),
+  lastName: z.string().min(1, { message: "Last name is required." }),
+  password: z.string().min(1, { message: "Password is required." }),
 });
+
+// You can add or modify users here
+const allowedUsers = [
+    { firstName: "John", lastName: "Doe", password: "password123" },
+    { firstName: "Jane", lastName: "Smith", password: "password456" },
+];
 
 export function LoginForm() {
   const router = useRouter();
@@ -37,13 +43,26 @@ export function LoginForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a pseudo-login. In a real app, you'd call an API.
-    console.log(values);
-    toast({
-      title: "Login Successful",
-      description: "Redirecting to your dashboard...",
-    });
-    router.push("/dashboard");
+    const user = allowedUsers.find(
+      (u) =>
+        u.firstName.toLowerCase() === values.firstName.toLowerCase() &&
+        u.lastName.toLowerCase() === values.lastName.toLowerCase() &&
+        u.password === values.password
+    );
+
+    if (user) {
+        toast({
+            title: "Connexion réussie",
+            description: "Redirection vers votre tableau de bord...",
+        });
+        router.push("/dashboard");
+    } else {
+        toast({
+            title: "Échec de la connexion",
+            description: "Identifiants incorrects. Veuillez réessayer.",
+            variant: "destructive",
+        });
+    }
   }
 
   return (
