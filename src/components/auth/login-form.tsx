@@ -40,7 +40,7 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const user = allowedUsers.find(
       (u) =>
         u.firstName.toLowerCase() === values.firstName.toLowerCase() &&
@@ -53,6 +53,10 @@ export function LoginForm() {
             title: "Connexion réussie",
             description: "Redirection vers votre tableau de bord...",
         });
+        
+        // Use a short delay to ensure the toast is rendered before navigation
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Force redirection using window.location
         window.location.href = "/dashboard";
     } else {
