@@ -19,9 +19,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  firstName: z.string().min(1, { message: "Le prénom est requis." }),
-  lastName: z.string().min(1, { message: "Le nom est requis." }),
-  password: z.string().min(1, { message: "Le mot de passe est requis." }),
+  firstName: z.string(),
+  lastName: z.string(),
+  password: z.string(),
 });
 
 export function LoginForm() {
