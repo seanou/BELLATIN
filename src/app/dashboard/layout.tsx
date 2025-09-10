@@ -60,18 +60,9 @@ const channels = [
   { id: '5', name: 'events-announcements', unread: 1 },
 ];
 
-const directMessages = [
-  { id: 'user1', name: 'Alice Johnson', avatarId: 'avatar1', online: true },
-  { id: 'user2', name: 'Bob Williams', avatarId: 'avatar2' },
-  { id: 'user3', name: 'Charlie Brown', avatarId: 'avatar3', online: true },
-  { id: 'user4', name: 'Diana Miller', avatarId: 'avatar4' },
-];
+const directMessages: any[] = [];
 
-const notifications = [
-  { user: 'Bob Williams', channel: '#cs101-study-group', message: 'Hey, did anyone finish the assignment?' },
-  { user: 'Events Bot', channel: '#events-announcements', message: 'Robotics Club meeting today at 6 PM in Room 204.' },
-  { user: 'Alice Johnson', channel: 'Direct Message', message: 'Let’s grab coffee tomorrow!' },
-];
+const notifications: any[] = [];
 
 function NotificationsPopover() {
   return (
@@ -79,7 +70,9 @@ function NotificationsPopover() {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 h-4 w-4 justify-center p-0 text-xs" variant="destructive">{notifications.length}</Badge>
+          {notifications.length > 0 && (
+            <Badge className="absolute -top-1 -right-1 h-4 w-4 justify-center p-0 text-xs" variant="destructive">{notifications.length}</Badge>
+          )}
           <span className="sr-only">Toggle notifications</span>
         </Button>
       </PopoverTrigger>
@@ -89,19 +82,23 @@ function NotificationsPopover() {
             <CardTitle className="text-base">Notifications</CardTitle>
           </CardHeader>
           <CardContent className="p-2 pb-0">
-            <div className="space-y-4">
-              {notifications.map((notification, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <MessageCircle className="h-5 w-5 text-muted-foreground mt-1" />
-                  <div>
-                    <p className="text-sm">
-                      <span className="font-semibold">{notification.user}</span> in <span className="text-primary">{notification.channel}</span>
-                    </p>
-                    <p className="text-sm text-muted-foreground">{notification.message}</p>
+            {notifications.length > 0 ? (
+              <div className="space-y-4">
+                {notifications.map((notification, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <MessageCircle className="h-5 w-5 text-muted-foreground mt-1" />
+                    <div>
+                      <p className="text-sm">
+                        <span className="font-semibold">{notification.user}</span> in <span className="text-primary">{notification.channel}</span>
+                      </p>
+                      <p className="text-sm text-muted-foreground">{notification.message}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center">You're all caught up!</p>
+            )}
           </CardContent>
         </Card>
       </PopoverContent>
