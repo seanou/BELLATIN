@@ -19,8 +19,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(1, { message: "Password is required." }),
+  firstName: z.string().min(1, { message: "Le prénom est requis." }),
+  lastName: z.string().min(1, { message: "Le nom est requis." }),
+  password: z.string().min(1, { message: "Le mot de passe est requis." }),
 });
 
 export function LoginForm() {
@@ -29,7 +30,8 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      firstName: "",
+      lastName: "",
       password: "",
     },
   });
@@ -49,12 +51,25 @@ export function LoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
         <FormField
           control={form.control}
-          name="email"
+          name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Prénom</FormLabel>
               <FormControl>
-                <Input placeholder="name@university.edu" {...field} />
+                <Input placeholder="Prénom" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nom</FormLabel>
+              <FormControl>
+                <Input placeholder="Nom" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +81,7 @@ export function LoginForm() {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center">
-                <FormLabel>Password</FormLabel>
+                <FormLabel>Mot de passe</FormLabel>
                 <Link
                   href="#"
                   className="ml-auto inline-block text-sm underline"
