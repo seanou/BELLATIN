@@ -1,17 +1,26 @@
 
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { placeholderImages } from "@/lib/placeholder-images";
-import { Paperclip, SendHorizonal } from "lucide-react";
+import { Paperclip, SendHorizonal, Lock, Unlock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const messages: any[] = [];
 
 export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: boolean }) {
-  // In a real app, you would fetch messages for the given channelName
-  // For now, we'll just display a welcome message.
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isAnnoncesLocked, setIsAnnoncesLocked] = useState(channelName === "Annonces");
 
+  useEffect(() => {
+    setIsAnnoncesLocked(channelName === "Annonces");
+    setInputValue("");
+  }, [channelName]);
+  
   const welcomeMessage = channelName 
     ? `This is the beginning of your conversation with ${isDM ? '' : '#'}${channelName}.`
     : "Select a channel to start chatting.";
@@ -28,6 +37,40 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
     },
     ...messages
   ];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim()) return;
+
+    if (channelName === "Annonces" && isAnnoncesLocked) {
+      if (inputValue === "0511") {
+        setIsAnnoncesLocked(false);
+        setInputValue("");
+      } else {
+        // Maybe show an error toast here in the future
+        setInputValue("");
+      }
+      return;
+    }
+
+    const newMessage = {
+        id: messages.length + 1,
+        user: "John Doe",
+        avatarId: 'my-avatar',
+        text: inputValue,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isCurrentUser: true,
+    };
+
+    setMessages([...messages, newMessage]);
+    setInputValue("");
+  };
+
+  const isInputDisabled = channelName === "Annonces" && isAnnoncesLocked;
+  const inputPlaceholder = isInputDisabled
+    ? "Enter authorization code..."
+    : "Type a message...";
+
 
   return (
     <div className="flex flex-col h-[calc(100vh-theme(spacing.14))]">
@@ -65,8 +108,13 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
         })}
       </div>
       <div className="p-4 border-t bg-background">
-        <form className="relative">
-          <Input placeholder="Type a message..." className="pr-24 h-11" />
+        <form className="relative" onSubmit={handleSubmit}>
+          <Input 
+            placeholder={inputPlaceholder}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="pr-24 h-11" 
+          />
           <div className="absolute inset-y-0 right-2 flex items-center">
             <Label htmlFor="file-upload" className="cursor-pointer">
               <Button type="button" variant="ghost" size="icon" asChild>
@@ -78,7 +126,11 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
             </Label>
             <Input id="file-upload" type="file" className="hidden" />
             <Button type="submit" variant="ghost" size="icon">
-              <SendHorizonal className="w-5 h-5 text-muted-foreground" />
+                {isInputDisabled ? (
+                    <Lock className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                    <SendHorizonal className="w-5 h-5 text-muted-foreground" />
+                )}
               <span className="sr-only">Send message</span>
             </Button>
           </div>
