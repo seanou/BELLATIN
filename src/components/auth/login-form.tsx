@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ const allowedUsers = [
 ];
 
 export function LoginForm() {
-  const router = useRouter();
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,7 +53,8 @@ export function LoginForm() {
             title: "Connexion réussie",
             description: "Redirection vers votre tableau de bord...",
         });
-        router.push("/dashboard");
+        // Force redirection using window.location
+        window.location.href = "/dashboard";
     } else {
         toast({
             title: "Échec de la connexion",
