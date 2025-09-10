@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { placeholderImages } from "@/lib/placeholder-images";
-import { Paperclip, SendHorizonal, Lock, Unlock, Trash2 } from "lucide-react";
+import { Paperclip, SendHorizonal, Lock, Cog, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const messages: any[] = [];
@@ -18,6 +18,7 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
 
   useEffect(() => {
     setIsAnnoncesLocked(channelName === "Annonces");
+    setMessages([]);
     setInputValue("");
   }, [channelName]);
   
@@ -53,10 +54,12 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
       return;
     }
 
+    const isAnnoncesChannel = channelName === "Annonces";
+
     const newMessage = {
         id: messages.length + 1,
-        user: "John Doe",
-        avatarId: 'my-avatar',
+        user: isAnnoncesChannel ? "Equipe de Collège Connect" : "John Doe",
+        avatarId: isAnnoncesChannel ? "annonces-avatar" : "my-avatar",
         text: inputValue,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isCurrentUser: true,
@@ -73,7 +76,7 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
   const isInputDisabled = channelName === "Annonces" && isAnnoncesLocked;
   const inputPlaceholder = isInputDisabled
     ? "Enter authorization code..."
-    : "Type a message...";
+    : `Message #${channelName}`;
 
 
   return (
@@ -88,12 +91,20 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
                 )
             }
             const avatar = placeholderImages.find(p => p.id === message.avatarId);
+            const isAnnoncesMessage = message.avatarId === 'annonces-avatar';
+
             return (
               <div key={message.id} className={`group flex items-end gap-3 ${message.isCurrentUser ? 'justify-end' : ''}`}>
                 {!message.isCurrentUser && (
                   <Avatar className="h-9 w-9">
-                    {avatar && <AvatarImage src={avatar.imageUrl} alt={message.user} />}
-                    <AvatarFallback>{message.user.charAt(0)}</AvatarFallback>
+                    {isAnnoncesMessage ? (
+                      <AvatarFallback><Cog className="h-5 w-5"/></AvatarFallback>
+                    ) : (
+                      <>
+                        {avatar && <AvatarImage src={avatar.imageUrl} alt={message.user} />}
+                        <AvatarFallback>{message.user.charAt(0)}</AvatarFallback>
+                      </>
+                    )}
                   </Avatar>
                 )}
                  {message.isCurrentUser && (
@@ -114,8 +125,14 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
                 </div>
                 {message.isCurrentUser && (
                   <Avatar className="h-9 w-9">
-                    {avatar && <AvatarImage src={avatar.imageUrl} alt={message.user} />}
-                    <AvatarFallback>{message.user.charAt(0)}</AvatarFallback>
+                    {isAnnoncesMessage ? (
+                      <AvatarFallback><Cog className="h-5 w-5"/></AvatarFallback>
+                    ) : (
+                      <>
+                        {avatar && <AvatarImage src={avatar.imageUrl} alt={message.user} />}
+                        <AvatarFallback>{message.user.charAt(0)}</AvatarFallback>
+                      </>
+                    )}
                   </Avatar>
                 )}
               </div>
@@ -128,7 +145,8 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
             placeholder={inputPlaceholder}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="pr-24 h-11" 
+            className="pr-24 h-11"
+            disabled={!channelName}
           />
           <div className="absolute inset-y-0 right-2 flex items-center">
             <Label htmlFor="file-upload" className="cursor-pointer">
@@ -140,7 +158,7 @@ export function ChatView({ channelName, isDM }: { channelName?: string; isDM?: b
               </Button>
             </Label>
             <Input id="file-upload" type="file" className="hidden" />
-            <Button type="submit" variant="ghost" size="icon">
+            <Button type="submit" variant="ghost" size="icon" disabled={!channelName || !inputValue.trim()}>
                 {isInputDisabled ? (
                     <Lock className="w-5 h-5 text-muted-foreground" />
                 ) : (
