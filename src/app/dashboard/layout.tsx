@@ -53,11 +53,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { placeholderImages } from '@/lib/placeholder-images';
 
 const channels = [
-  { id: '1', name: 'general', unread: 3 },
-  { id: '2', name: 'random' },
-  { id: '3', name: 'cs101-study-group' },
-  { id: '4', name: 'robotics-club' },
-  { id: '5', name: 'events-announcements', unread: 1 },
+  { id: '1', name: '3A' },
+  { id: '2', name: 'Latinistes' },
+  { id: '3', name: 'LCE Espagnol LV1' },
+  { id: '4', name: 'Annonces' },
 ];
 
 const directMessages: any[] = [];
@@ -115,7 +114,7 @@ function BreadcrumbCurrentPage() {
   }
 
   if (pathSegments.includes('channel')) {
-    const channelName = pathSegments[pathSegments.length - 1];
+    const channelName = decodeURIComponent(pathSegments[pathSegments.length - 1]);
     return <BreadcrumbPage>#{channelName}</BreadcrumbPage>;
   }
 
@@ -134,7 +133,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   
   const pathSegments = pathname.split('/').filter(Boolean);
-  const activeId = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : 'general';
+  const activeId = pathSegments.length > 2 ? decodeURIComponent(pathSegments[pathSegments.length - 1]) : '3A';
   
   return (
     <SidebarProvider>
