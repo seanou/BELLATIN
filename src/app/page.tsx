@@ -11,7 +11,7 @@ const LatinAppStyles = () => (
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #770206;
       min-height: 100vh;
       width: 100vw;
     }
@@ -43,7 +43,7 @@ const LatinAppStyles = () => (
     }
 
     h1 {
-      color: #667eea;
+      color: #770206;
       margin: 0 0 10px 0;
       font-size: 32px;
       text-align: center;
@@ -56,7 +56,7 @@ const LatinAppStyles = () => (
     }
 
     h3 {
-      color: #667eea;
+      color: #770206;
       font-size: 18px;
       margin: 0 0 15px 0;
     }
@@ -94,7 +94,7 @@ const LatinAppStyles = () => (
     input[type="text"]:focus,
     input[type="number"]:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #770206;
     }
 
     .slider-container {
@@ -116,7 +116,7 @@ const LatinAppStyles = () => (
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #667eea;
+      background: #770206;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
@@ -125,7 +125,7 @@ const LatinAppStyles = () => (
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #667eea;
+      background: #770206;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       border: none;
@@ -133,7 +133,7 @@ const LatinAppStyles = () => (
 
     .slider-value {
       text-align: center;
-      color: #667eea;
+      color: #770206;
       font-weight: 600;
       font-size: 18px;
       margin-top: 8px;
@@ -142,7 +142,7 @@ const LatinAppStyles = () => (
     .btn {
       width: 100%;
       padding: 14px 24px;
-      background: #667eea;
+      background: #770206;
       color: white;
       border: none;
       border-radius: 8px;
@@ -153,7 +153,7 @@ const LatinAppStyles = () => (
     }
 
     .btn:hover {
-      background: #5568d3;
+      background: #5a0104;
     }
 
     .btn:active {
@@ -199,7 +199,7 @@ const LatinAppStyles = () => (
     }
 
     .category-title {
-      color: #667eea;
+      color: #770206;
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 20px 0;
@@ -226,7 +226,7 @@ const LatinAppStyles = () => (
     .game-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      border-color: #667eea;
+      border-color: #770206;
     }
 
     .game-icon {
@@ -274,7 +274,7 @@ const LatinAppStyles = () => (
 
     .option-btn:hover {
       background: #e8e8e8;
-      border-color: #667eea;
+      border-color: #770206;
     }
 
     .option-btn.correct {
@@ -292,7 +292,7 @@ const LatinAppStyles = () => (
     .score-display {
       text-align: center;
       font-size: 18px;
-      color: #667eea;
+      color: #770206;
       font-weight: 600;
       margin-bottom: 20px;
     }
@@ -347,7 +347,7 @@ const LatinAppStyles = () => (
       width: 20px;
       height: 20px;
       cursor: pointer;
-      accent-color: #667eea;
+      accent-color: #770206;
     }
 
     .back-btn {
@@ -372,7 +372,7 @@ const LatinAppStyles = () => (
 
     .word-btn {
       padding: 10px 16px;
-      background: #667eea;
+      background: #770206;
       color: white;
       border: none;
       border-radius: 6px;
@@ -390,7 +390,7 @@ const LatinAppStyles = () => (
       min-height: 80px;
       padding: 16px;
       background: white;
-      border: 2px dashed #667eea;
+      border: 2px dashed #770206;
       border-radius: 8px;
       margin-bottom: 24px;
       display: flex;
