@@ -47,6 +47,18 @@ export const gameData = {
       { latin: "Aqua", french: "Feu", correct: false },
       { latin: "Puella", french: "Fille", correct: true },
       { latin: "Liber", french: "Liberté", correct: false },
+    ],
+    declinaison: [
+        { question: "Quelle est la terminaison du génitif singulier de la 1ère déclinaison ?", options: ["-a", "-ae", "-am", "-arum"], correct: 1, declinaison: "1ere" },
+        { question: "Le mot 'rosa' (la rose) est à la 1ère déclinaison. Quel est son accusatif pluriel ?", options: ["rosas", "rosae", "rosis", "rosarum"], correct: 0, declinaison: "1ere" },
+        { question: "Quelle est la terminaison du nominatif singulier pour les noms masculins de la 2ème déclinaison ?", options: ["-us", "-um", "-i", "-o"], correct: 0, declinaison: "2eme" },
+        { question: "Le mot 'dominus' (le maître) est à la 2ème déclinaison. Quel est son datif singulier ?", options: ["domine", "dominum", "domino", "domini"], correct: 2, declinaison: "2eme" },
+        { question: "La 3ème déclinaison a des modèles... ?", options: ["Uniquement masculins", "Uniquement féminins", "Masculins, féminins et neutres", "Uniquement neutres"], correct: 2, declinaison: "3eme" },
+        { question: "Le mot 'rex' (le roi) est de la 3ème déclinaison. Quel est son génitif singulier ?", options: ["rex", "regis", "regi", "regem"], correct: 1, declinaison: "3eme" },
+        { question: "Quelle est la terminaison du nominatif singulier de la 4ème déclinaison (masculin) ?", options: ["-us", "-u", "-um", "-ibus"], correct: 0, declinaison: "4eme" },
+        { question: "Le mot 'manus' (la main) est à la 4ème déclinaison. Quel est son ablatif pluriel ?", options: ["manus", "manuum", "manibus", "manum"], correct: 2, declinaison: "4eme" },
+        { question: "Quelle est la terminaison du génitif singulier de la 5ème déclinaison ?", options: ["-es", "-ei", "-em", "-e"], correct: 1, declinaison: "5eme" },
+        { question: "Le mot 'res' (la chose) est à la 5ème déclinaison. Quel est son accusatif pluriel ?", options: ["res", "rerum", "rebus", "res"], correct: 3, declinaison: "5eme" }
     ]
   },
   intermediaire: {
@@ -81,6 +93,18 @@ export const gameData = {
     vraifaux: [
         { latin: "Fortis", french: "Fort", correct: true },
         { latin: "Bellum", french: "Beauté", correct: false },
+    ],
+    declinaison: [
+        { question: "Quelle est la terminaison du génitif singulier de la 1ère déclinaison ?", options: ["-a", "-ae", "-am", "-arum"], correct: 1, declinaison: "1ere" },
+        { question: "Le mot 'rosa' (la rose) est à la 1ère déclinaison. Quel est son accusatif pluriel ?", options: ["rosas", "rosae", "rosis", "rosarum"], correct: 0, declinaison: "1ere" },
+        { question: "Quelle est la terminaison du nominatif singulier pour les noms masculins de la 2ème déclinaison ?", options: ["-us", "-um", "-i", "-o"], correct: 0, declinaison: "2eme" },
+        { question: "Le mot 'dominus' (le maître) est à la 2ème déclinaison. Quel est son datif singulier ?", options: ["domine", "dominum", "domino", "domini"], correct: 2, declinaison: "2eme" },
+        { question: "La 3ème déclinaison a des modèles... ?", options: ["Uniquement masculins", "Uniquement féminins", "Masculins, féminins et neutres", "Uniquement neutres"], correct: 2, declinaison: "3eme" },
+        { question: "Le mot 'rex' (le roi) est de la 3ème déclinaison. Quel est son génitif singulier ?", options: ["rex", "regis", "regi", "regem"], correct: 1, declinaison: "3eme" },
+        { question: "Quelle est la terminaison du nominatif singulier de la 4ème déclinaison (masculin) ?", options: ["-us", "-u", "-um", "-ibus"], correct: 0, declinaison: "4eme" },
+        { question: "Le mot 'manus' (la main) est à la 4ème déclinaison. Quel est son ablatif pluriel ?", options: ["manus", "manuum", "manibus", "manum"], correct: 2, declinaison: "4eme" },
+        { question: "Quelle est la terminaison du génitif singulier de la 5ème déclinaison ?", options: ["-es", "-ei", "-em", "-e"], correct: 1, declinaison: "5eme" },
+        { question: "Le mot 'res' (la chose) est à la 5ème déclinaison. Quel est son accusatif pluriel ?", options: ["res", "rerum", "rebus", "res"], correct: 3, declinaison: "5eme" }
     ]
   },
   avance: {
@@ -115,6 +139,18 @@ export const gameData = {
     vraifaux: [
         { latin: "Virtus", french: "Vertu", correct: true },
         { latin: "Sapientia", french: "Science", correct: false },
+    ],
+    declinaison: [
+        { question: "Quelle est la terminaison du génitif singulier de la 1ère déclinaison ?", options: ["-a", "-ae", "-am", "-arum"], correct: 1, declinaison: "1ere" },
+        { question: "Le mot 'rosa' (la rose) est à la 1ère déclinaison. Quel est son accusatif pluriel ?", options: ["rosas", "rosae", "rosis", "rosarum"], correct: 0, declinaison: "1ere" },
+        { question: "Quelle est la terminaison du nominatif singulier pour les noms masculins de la 2ème déclinaison ?", options: ["-us", "-um", "-i", "-o"], correct: 0, declinaison: "2eme" },
+        { question: "Le mot 'dominus' (le maître) est à la 2ème déclinaison. Quel est son datif singulier ?", options: ["domine", "dominum", "domino", "domini"], correct: 2, declinaison: "2eme" },
+        { question: "La 3ème déclinaison a des modèles... ?", options: ["Uniquement masculins", "Uniquement féminins", "Masculins, féminins et neutres", "Uniquement neutres"], correct: 2, declinaison: "3eme" },
+        { question: "Le mot 'rex' (le roi) est de la 3ème déclinaison. Quel est son génitif singulier ?", options: ["rex", "regis", "regi", "regem"], correct: 1, declinaison: "3eme" },
+        { question: "Quelle est la terminaison du nominatif singulier de la 4ème déclinaison (masculin) ?", options: ["-us", "-u", "-um", "-ibus"], correct: 0, declinaison: "4eme" },
+        { question: "Le mot 'manus' (la main) est à la 4ème déclinaison. Quel est son ablatif pluriel ?", options: ["manus", "manuum", "manibus", "manum"], correct: 2, declinaison: "4eme" },
+        { question: "Quelle est la terminaison du génitif singulier de la 5ème déclinaison ?", options: ["-es", "-ei", "-em", "-e"], correct: 1, declinaison: "5eme" },
+        { question: "Le mot 'res' (la chose) est à la 5ème déclinaison. Quel est son accusatif pluriel ?", options: ["res", "rerum", "rebus", "res"], correct: 3, declinaison: "5eme" }
     ]
   }
 };

@@ -577,6 +577,15 @@ export default function LatinPlatformPage() {
             ablatif: document.getElementById('decl-ablatif').checked,
         };
         filteredQuestions = allQuestions.filter(q => q.declinaisons.some(d => declinaisons[d]));
+    } else if (gameType === 'declinaison') {
+        const decls = {
+            '1ere': document.getElementById('decl-1').checked,
+            '2eme': document.getElementById('decl-2').checked,
+            '3eme': document.getElementById('decl-3').checked,
+            '4eme': document.getElementById('decl-4').checked,
+            '5eme': document.getElementById('decl-5').checked,
+        };
+        filteredQuestions = allQuestions.filter(q => decls[q.declinaison]);
     }
     
     if (filteredQuestions.length === 0) {
@@ -844,7 +853,21 @@ export default function LatinPlatformPage() {
                 </div>
             </div>
         );
+    } else if (gameState.type === 'declinaison') {
+         specificConfig = (
+             <div className="config-section">
+                <h3>Déclinaisons à réviser :</h3>
+                <div className="checkbox-grid">
+                    <label className="checkbox-label"><input type="checkbox" id="decl-1" defaultChecked/><span>1ère déclinaison</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-2" defaultChecked/><span>2ème déclinaison</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-3" defaultChecked/><span>3ème déclinaison</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-4" defaultChecked/><span>4ème déclinaison</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-5" defaultChecked/><span>5ème déclinaison</span></label>
+                </div>
+            </div>
+        );
     }
+
 
     return (
         <div>
@@ -872,8 +895,8 @@ export default function LatinPlatformPage() {
           <Image 
             src="https://i.ibb.co/N2jmFGcY/91f3c1ed-bd46-47d8-9599-235a22473f89-removebg-preview.png" 
             alt="Logo"
-            width={200}
-            height={200}
+            width={300}
+            height={300}
             priority
           />
           <div className="loader"></div>
@@ -963,6 +986,12 @@ export default function LatinPlatformPage() {
                     <div className="hub-grid">
                         <GameCard emoji="⚡" title="Quiz de Conjugaison" onClick={() => startGame('conjugaison')} />
                         <GameCard emoji="⏰" title="Identifier les Temps" onClick={() => startGame('temps')} />
+                    </div>
+                </div>
+                <div className="category-section">
+                    <h2 className="category-title">📜 Déclinaison</h2>
+                    <div className="hub-grid">
+                        <GameCard emoji="🏛️" title="Quiz de Déclinaison" onClick={() => startGame('declinaison')} />
                     </div>
                 </div>
                 <div className="category-section">
