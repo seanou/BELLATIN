@@ -593,7 +593,7 @@ export default function LatinPlatformPage() {
         return;
     }
     
-    const questions = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
+    const questions = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
     const shuffledWords = gameType === 'reconstitution' ? [...questions[0]?.words].sort(() => Math.random() - 0.5) : [];
 
     setGameState({
@@ -732,7 +732,7 @@ export default function LatinPlatformPage() {
 
     const GameHeader = () => (
       <div className="score-display">
-        Score : {gameState.score}/{gameState.questions.length}
+        Question {gameState.currentQuestion + 1}/{gameState.questions.length} - Score : {gameState.score}
         {gameState.timerSeconds && 
           <span className={`timer-display ${gameState.timeRemaining <= 5 && gameState.timeRemaining > 0 ? 'warning' : ''}`}>
             ⏱️ {gameState.timeRemaining}s
@@ -895,8 +895,8 @@ export default function LatinPlatformPage() {
           <Image 
             src="https://i.ibb.co/N2jmFGcY/91f3c1ed-bd46-47d8-9599-235a22473f89-removebg-preview.png" 
             alt="Logo"
-            width={300}
-            height={300}
+            width={400}
+            height={400}
             priority
           />
           <div className="loader"></div>
