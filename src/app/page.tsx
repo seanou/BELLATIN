@@ -457,6 +457,16 @@ const LatinAppStyles = () => (
       background: #ffebee;
       color: #d32f2f;
     }
+    
+    .app-footer {
+      position: fixed;
+      bottom: 15px;
+      right: 20px;
+      color: white;
+      font-size: 12px;
+      font-family: 'Segoe UI', sans-serif;
+      opacity: 0.7;
+    }
   `}</style>
 );
 
@@ -1017,6 +1027,7 @@ export default function LatinPlatformPage() {
 
         </div>
       </div>
+      <div className="app-footer">Sean VERRON 2025</div>
     </>
   );
 }
