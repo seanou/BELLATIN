@@ -895,8 +895,8 @@ export default function LatinPlatformPage() {
           <Image 
             src="https://i.ibb.co/N2jmFGcY/91f3c1ed-bd46-47d8-9599-235a22473f89-removebg-preview.png" 
             alt="Logo"
-            width={400}
-            height={400}
+            width={570}
+            height={570}
             priority
           />
           <div className="loader"></div>
