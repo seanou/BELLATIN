@@ -903,7 +903,7 @@ export default function LatinPlatformPage() {
         <LatinAppStyles />
         <div className="splash-screen">
           <Image 
-            src="https://i.ibb.co/N2jmFGcY/91f3c1ed-bd46-47d8-9599-235a22473f89-removebg-preview.png" 
+            src="https://i.ibb.co/XZdV62pR/logofrjh-removebg-preview.png" 
             alt="Logo"
             width={570}
             height={570}
