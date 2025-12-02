@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { gameData } from '@/lib/latin-game-data';
 
 const LatinAppStyles = () => (
@@ -19,6 +20,32 @@ const LatinAppStyles = () => (
     * {
       box-sizing: border-box;
     }
+
+    .splash-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-color: #770206;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
 
     .main-container {
       width: 100%;
@@ -453,8 +480,16 @@ export default function LatinPlatformPage() {
   const [screen, setScreen] = useState('questionnaire');
   const [userProfile, setUserProfile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [gameState, setGameState] = useState(initialGameState);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const calculateProfile = (level, years) => {
     const score = (level * 2) + (years * 3);
@@ -828,6 +863,24 @@ export default function LatinPlatformPage() {
       <h3 className="game-title">{title}</h3>
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <>
+        <LatinAppStyles />
+        <div className="splash-screen">
+          <Image 
+            src="https://i.ibb.co/N2jmFGcY/91f3c1ed-bd46-47d8-9599-235a22473f89-removebg-preview.png" 
+            alt="Logo"
+            width={200}
+            height={200}
+            priority
+          />
+          <div className="loader"></div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
