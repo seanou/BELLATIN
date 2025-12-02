@@ -1,104 +1,414 @@
-import { Star, Ticket, Award } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+'use client';
 
-export default function Home() {
-  const euroNumbers = [5, 12, 25, 33, 47];
-  const euroStars = [7, 11];
-  const myMillionCode = 'DF 123 4567';
-  const drawDate = "Tirage du Mardi 16 Juillet 2024";
+import { useState, useEffect } from 'react';
+
+// Since the user provided a lot of custom CSS, we'll use a <style> tag for now.
+// In a real app, this would be moved to a separate CSS file.
+const LatinAppStyles = () => (
+  <style jsx global>{`
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      width: 100vw;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .main-container {
+      width: 100%;
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .content-wrapper {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #667eea;
+      margin: 0 0 10px 0;
+      font-size: 32px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #333;
+      font-size: 24px;
+      margin: 0 0 20px 0;
+    }
+
+    h3 {
+      color: #667eea;
+      font-size: 18px;
+      margin: 0 0 15px 0;
+    }
+
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin: 0 0 30px 0;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+      color: #333;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .slider-container {
+      margin-top: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e0e0e0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      border: none;
+    }
+
+    .slider-value {
+      text-align: center;
+      color: #667eea;
+      font-weight: 600;
+      font-size: 18px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.1s;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .profile-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    .profile-debutant {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .profile-intermediaire {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .profile-avance {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .category-section {
+      margin-top: 40px;
+    }
+
+    .category-section:first-of-type {
+      margin-top: 30px;
+    }
+
+    .category-title {
+      color: #667eea;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .game-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 2px solid #e0e0e0;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      border-color: #667eea;
+    }
+
+    .game-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .game-title {
+      color: #333;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .game-container {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      margin-top: 20px;
+    }
+  `}</style>
+);
+
+export default function LatinPlatformPage() {
+  const [niveau, setNiveau] = useState(5);
+  const [screen, setScreen] = useState('questionnaire'); // 'questionnaire', 'hub', 'game'
+  const [userProfile, setUserProfile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const calculateProfile = (level, years) => {
+    const score = (level * 2) + (years * 3);
+    if (score <= 10) return 'debutant';
+    if (score <= 25) return 'intermediaire';
+    return 'avance';
+  };
+  
+  const getProfileLabel = (profil) => {
+    const labels = {
+      'debutant': 'Débutant',
+      'intermediaire': 'Intermédiaire',
+      'avance': 'Avancé'
+    };
+    return labels[profil] || 'Débutant';
+  }
+
+  const handleQuestionnaireSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.target);
+    const pseudo = formData.get('pseudo');
+    const age = parseInt(formData.get('age'));
+    const anneesLatin = parseInt(formData.get('annees'));
+    const niveauValue = parseInt(formData.get('niveau'));
+
+    const profil = calculateProfile(niveauValue, anneesLatin);
+
+    const profileData = {
+      pseudo,
+      profil,
+    };
+    
+    // Simulate API call
+    setTimeout(() => {
+      setUserProfile(profileData);
+      setScreen('hub');
+      setIsSubmitting(false);
+    }, 1000);
+  };
+  
+  const GameCard = ({ emoji, title, onClick }) => (
+    <div className="game-card" onClick={onClick}>
+      <div className="game-icon">{emoji}</div>
+      <h3 className="game-title">{title}</h3>
+    </div>
+  );
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="bg-primary text-primary-foreground py-6 px-4 md:px-6">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Ticket className="h-8 w-8" />
-            <h1 className="text-2xl font-bold">EuroMillions & My Million</h1>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 container mx-auto py-8 md:py-12 px-4 md:px-6">
-        <div className="flex flex-col items-center text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            Derniers Résultats
-          </h2>
-          <p className="text-muted-foreground">{drawDate}</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Award className="text-primary" />
-                EuroMillions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center">
-                <p className="mb-4 text-muted-foreground">Numéros gagnants :</p>
-                <div className="flex items-center justify-center gap-2 md:gap-4 mb-6">
-                  {euroNumbers.map((num) => (
-                    <div
-                      key={num}
-                      className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-primary text-primary-foreground rounded-full text-2xl font-bold shadow-inner"
-                    >
-                      {num}
+    <>
+      <LatinAppStyles />
+      <div className="main-container">
+        <div className="content-wrapper">
+          {screen === 'questionnaire' && (
+            <div id="questionnaire-screen" className="card">
+              <h1 id="app-title">Apprentissage du Latin</h1>
+              <p className="subtitle" id="welcome-message">
+                Bienvenue ! Commencez par nous en dire un peu plus sur vous.
+              </p>
+              <form id="questionnaire-form" onSubmit={handleQuestionnaireSubmit}>
+                <div className="form-group">
+                  <label htmlFor="pseudo">Pseudo</label>
+                  <input type="text" id="pseudo" name="pseudo" required placeholder="Votre pseudo" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="age">Âge</label>
+                  <input type="number" id="age" name="age" required min="1" max="120" placeholder="Votre âge" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="niveau">Niveau actuel (1-10)</label>
+                  <div className="slider-container">
+                    <input
+                      type="range"
+                      id="niveau"
+                      name="niveau"
+                      min="1"
+                      max="10"
+                      value={niveau}
+                      onChange={(e) => setNiveau(parseInt(e.target.value))}
+                    />
+                    <div className="slider-value" id="niveau-value">
+                      {niveau}
                     </div>
-                  ))}
+                  </div>
                 </div>
-                <p className="mb-4 text-muted-foreground">Étoiles :</p>
-                <div className="flex items-center justify-center gap-2 md:gap-4">
-                  {euroStars.map((star) => (
-                    <div
-                      key={star}
-                      className="relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14"
-                    >
-                      <Star className="absolute text-accent fill-current w-full h-full" />
-                      <span className="relative z-10 text-accent-foreground text-2xl font-bold">
-                        {star}
-                      </span>
+                <div className="form-group">
+                  <label htmlFor="annees">Nombre d'années de latin</label>
+                  <input
+                    type="number"
+                    id="annees"
+                    name="annees"
+                    required
+                    min="0"
+                    max="20"
+                    placeholder="Années d'étude"
+                    defaultValue="0"
+                  />
+                </div>
+                <button type="submit" className="btn" id="submit-btn" disabled={isSubmitting}>
+                  {isSubmitting ? 'Création de votre profil...' : 'Commencer l\'aventure'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {screen === 'hub' && userProfile && (
+            <div id="hub-screen" className="card">
+                 <h1>Bienvenue <span id="user-pseudo">{userProfile.pseudo}</span> !</h1>
+                 <p className="subtitle">Votre profil : <span className={`profile-badge profile-${userProfile.profil}`} id="user-profile">{getProfileLabel(userProfile.profil)}</span></p>
+
+                <div className="category-section">
+                    <h2 className="category-title">📖 Vocabulaire</h2>
+                    <div className="hub-grid">
+                        <GameCard emoji="📚" title="Cartes de Vocabulaire" />
+                        <GameCard emoji="✅" title="Vrai ou Faux" />
                     </div>
-                  ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Ticket className="text-primary" />
-                My Million
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center justify-center h-full">
-                <p className="mb-4 text-muted-foreground">Votre code gagnant :</p>
-                <div className="bg-secondary px-6 py-4 rounded-lg">
-                  <p className="text-3xl font-bold tracking-widest text-secondary-foreground">
-                    {myMillionCode}
-                  </p>
+                <div className="category-section">
+                    <h2 className="category-title">✏️ Grammaire</h2>
+                    <div className="hub-grid">
+                        <GameCard emoji="📝" title="Phrases à Comprendre" />
+                        <GameCard emoji="🔤" title="Reconstituer la Phrase" />
+                    </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="text-center mt-12">
-            <Button size="lg" className="shadow-lg">
-                Générer une grille
-            </Button>
-        </div>
-      </main>
+                 <div className="category-section">
+                    <h2 className="category-title">🔄 Conjugaison</h2>
+                    <div className="hub-grid">
+                        <GameCard emoji="⚡" title="Quiz de Conjugaison" />
+                        <GameCard emoji="⏰" title="Identifier les Temps" />
+                    </div>
+                </div>
+                <div className="category-section">
+                    <h2 className="category-title">🏛️ Culture</h2>
+                    <div className="hub-grid">
+                        <GameCard emoji="🎭" title="Culture Romaine" />
+                        <GameCard emoji="💬" title="Citations Célèbres" />
+                    </div>
+                </div>
+            </div>
+          )}
 
-      <footer className="bg-secondary text-secondary-foreground py-4 px-4 md:px-6 mt-auto">
-        <div className="container mx-auto text-center text-sm">
-          <p>Jouer comporte des risques : endettement, isolement, dépendance.</p>
-          <p>Pour être aidé, appelez le 09-74-75-13-13 (appel non surtaxé).</p>
+          {screen === 'game' && (
+             <div id="game-screen">
+                <div className="game-container">
+                    <div id="game-content">
+                        {/* Game content will be rendered here */}
+                    </div>
+                </div>
+            </div>
+          )}
+
         </div>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
