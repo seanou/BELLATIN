@@ -255,6 +255,7 @@ export default function LatinPlatformPage() {
   const [screen, setScreen] = useState('questionnaire'); // 'questionnaire', 'hub', 'game'
   const [userProfile, setUserProfile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentGame, setCurrentGame] = useState(null);
 
   const calculateProfile = (level, years) => {
     const score = (level * 2) + (years * 3);
@@ -295,6 +296,11 @@ export default function LatinPlatformPage() {
       setScreen('hub');
       setIsSubmitting(false);
     }, 1000);
+  };
+
+  const startGame = (gameType) => {
+    setCurrentGame(gameType);
+    setScreen('game');
   };
   
   const GameCard = ({ emoji, title, onClick }) => (
@@ -369,29 +375,29 @@ export default function LatinPlatformPage() {
                 <div className="category-section">
                     <h2 className="category-title">📖 Vocabulaire</h2>
                     <div className="hub-grid">
-                        <GameCard emoji="📚" title="Cartes de Vocabulaire" />
-                        <GameCard emoji="✅" title="Vrai ou Faux" />
+                        <GameCard emoji="📚" title="Cartes de Vocabulaire" onClick={() => startGame('vocab')} />
+                        <GameCard emoji="✅" title="Vrai ou Faux" onClick={() => startGame('vraifaux')} />
                     </div>
                 </div>
                 <div className="category-section">
                     <h2 className="category-title">✏️ Grammaire</h2>
                     <div className="hub-grid">
-                        <GameCard emoji="📝" title="Phrases à Comprendre" />
-                        <GameCard emoji="🔤" title="Reconstituer la Phrase" />
+                        <GameCard emoji="📝" title="Phrases à Comprendre" onClick={() => startGame('phrases')} />
+                        <GameCard emoji="🔤" title="Reconstituer la Phrase" onClick={() => startGame('reconstitution')} />
                     </div>
                 </div>
                  <div className="category-section">
                     <h2 className="category-title">🔄 Conjugaison</h2>
                     <div className="hub-grid">
-                        <GameCard emoji="⚡" title="Quiz de Conjugaison" />
-                        <GameCard emoji="⏰" title="Identifier les Temps" />
+                        <GameCard emoji="⚡" title="Quiz de Conjugaison" onClick={() => startGame('conjugaison')} />
+                        <GameCard emoji="⏰" title="Identifier les Temps" onClick={() => startGame('temps')} />
                     </div>
                 </div>
                 <div className="category-section">
                     <h2 className="category-title">🏛️ Culture</h2>
                     <div className="hub-grid">
-                        <GameCard emoji="🎭" title="Culture Romaine" />
-                        <GameCard emoji="💬" title="Citations Célèbres" />
+                        <GameCard emoji="🎭" title="Culture Romaine" onClick={() => startGame('culture')} />
+                        <GameCard emoji="💬" title="Citations Célèbres" onClick={() => startGame('citations')} />
                     </div>
                 </div>
             </div>
@@ -401,7 +407,8 @@ export default function LatinPlatformPage() {
              <div id="game-screen">
                 <div className="game-container">
                     <div id="game-content">
-                        {/* Game content will be rendered here */}
+                        <h2>Jeu: {currentGame}</h2>
+                        <button className="btn" onClick={() => setScreen('hub')}>Retour au hub</button>
                     </div>
                 </div>
             </div>
