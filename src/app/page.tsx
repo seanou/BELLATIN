@@ -1,9 +1,9 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { gameData } from '@/lib/latin-game-data';
 
-// Since the user provided a lot of custom CSS, we'll use a <style> tag for now.
-// In a real app, this would be moved to a separate CSS file.
 const LatinAppStyles = () => (
   <style jsx global>{`
     body {
@@ -247,15 +247,210 @@ const LatinAppStyles = () => (
       padding: 30px;
       margin-top: 20px;
     }
+    .question-text {
+      color: #333;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .options-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      padding: 16px;
+      background: #f5f5f5;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: left;
+    }
+
+    .option-btn:hover {
+      background: #e8e8e8;
+      border-color: #667eea;
+    }
+
+    .option-btn.correct {
+      background: #e8f5e9;
+      border-color: #388e3c;
+      color: #388e3c;
+    }
+
+    .option-btn.incorrect {
+      background: #ffebee;
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+
+    .score-display {
+      text-align: center;
+      font-size: 18px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .timer-display {
+      display: inline-block;
+      margin-left: 20px;
+      padding: 8px 16px;
+      background: #fff3e0;
+      color: #f57c00;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .timer-display.warning {
+      background: #ffebee;
+      color: #d32f2f;
+      animation: pulse 0.5s infinite;
+    }
+
+     @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .timer-config, .config-section {
+      margin-bottom: 20px;
+    }
+
+    .timer-option, .checkbox-label {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .timer-option:hover, .checkbox-label:hover {
+      background: #e8e8e8;
+    }
+
+    .timer-option input[type="radio"], .checkbox-label input {
+      margin-right: 10px;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .back-btn {
+      background: #9e9e9e;
+      margin-top: 20px;
+    }
+
+    .back-btn:hover {
+      background: #757575;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+      min-height: 60px;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .word-btn {
+      padding: 10px 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .word-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .sentence-construction {
+      min-height: 80px;
+      padding: 16px;
+      background: white;
+      border: 2px dashed #667eea;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .constructed-word {
+      padding: 10px 16px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .constructed-word:hover {
+      background: #bbdefb;
+    }
+
+    .feedback-message {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .feedback-correct {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .feedback-incorrect {
+      background: #ffebee;
+      color: #d32f2f;
+    }
   `}</style>
 );
 
+const initialGameState = {
+  type: null,
+  currentQuestion: 0,
+  score: 0,
+  questions: [],
+  config: {},
+  timerId: null,
+  timeRemaining: null,
+  timerSeconds: null,
+  constructedSentence: [],
+  shuffledWords: [],
+  feedback: null,
+  answered: false,
+};
+
 export default function LatinPlatformPage() {
   const [niveau, setNiveau] = useState(5);
-  const [screen, setScreen] = useState('questionnaire'); // 'questionnaire', 'hub', 'game'
+  const [screen, setScreen] = useState('questionnaire');
   const [userProfile, setUserProfile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentGame, setCurrentGame] = useState(null);
+  
+  const [gameState, setGameState] = useState(initialGameState);
+  const [gameConfig, setGameConfig] = useState({});
 
   const calculateProfile = (level, years) => {
     const score = (level * 2) + (years * 3);
@@ -279,7 +474,6 @@ export default function LatinPlatformPage() {
 
     const formData = new FormData(e.target);
     const pseudo = formData.get('pseudo');
-    const age = parseInt(formData.get('age'));
     const anneesLatin = parseInt(formData.get('annees'));
     const niveauValue = parseInt(formData.get('niveau'));
 
@@ -290,7 +484,6 @@ export default function LatinPlatformPage() {
       profil,
     };
     
-    // Simulate API call
     setTimeout(() => {
       setUserProfile(profileData);
       setScreen('hub');
@@ -298,11 +491,240 @@ export default function LatinPlatformPage() {
     }, 1000);
   };
 
+  const showHub = () => {
+    setScreen('hub');
+    setGameState(initialGameState);
+  }
+
   const startGame = (gameType) => {
-    setCurrentGame(gameType);
-    setScreen('game');
+    setGameState(prev => ({ ...prev, type: gameType }));
+    setScreen('game-config');
   };
   
+  const startConfiguredGame = (gameType) => {
+    const profil = userProfile.profil;
+    let allQuestions = gameData[profil]?.[gameType] || [];
+    let filteredQuestions = [...allQuestions];
+    
+    const timerValue = parseInt(gameConfig.timer) || null;
+
+    if (filteredQuestions.length === 0) {
+      alert("Aucune question disponible pour cette configuration.");
+      return;
+    }
+    
+    const questions = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
+    const shuffledWords = gameType === 'reconstitution' ? [...questions[0]?.words].sort(() => Math.random() - 0.5) : [];
+
+    setGameState({
+      ...initialGameState,
+      type: gameType,
+      questions: questions,
+      timerSeconds: timerValue,
+      timeRemaining: timerValue,
+      shuffledWords: shuffledWords,
+    });
+    setScreen('game');
+  };
+
+  const handleNextQuestion = useCallback(() => {
+    setGameState(prev => {
+        const nextQuestionIndex = prev.currentQuestion + 1;
+        if (nextQuestionIndex >= prev.questions.length) {
+            return { ...prev, currentQuestion: nextQuestionIndex }; // End game
+        }
+        const nextQuestion = prev.questions[nextQuestionIndex];
+        const shuffledWords = prev.type === 'reconstitution' ? [...nextQuestion.words].sort(() => Math.random() - 0.5) : [];
+        return {
+            ...prev,
+            currentQuestion: nextQuestionIndex,
+            timeRemaining: prev.timerSeconds,
+            feedback: null,
+            answered: false,
+            constructedSentence: [],
+            shuffledWords: shuffledWords,
+        };
+    });
+  }, []);
+
+  const handleAnswer = (isCorrect) => {
+      if (gameState.answered) return;
+      setGameState(prev => ({
+          ...prev,
+          answered: true,
+          score: isCorrect ? prev.score + 1 : prev.score,
+          feedback: isCorrect ? 'Correct !' : `Incorrect. La bonne réponse était : ${getCorrectAnswer(prev.questions[prev.currentQuestion])}`,
+      }));
+      setTimeout(handleNextQuestion, 2000);
+  };
+  
+  const getCorrectAnswer = (question) => {
+      if (!question) return '';
+      switch (gameState.type) {
+          case 'reconstitution':
+              return question.correct.join(' ');
+          case 'vraifaux':
+              return question.correct ? 'Vrai' : 'Faux';
+          default:
+              return question.options[question.correct];
+      }
+  }
+
+  useEffect(() => {
+    if (screen !== 'game' || !gameState.timerSeconds || gameState.answered) {
+      return;
+    }
+
+    if (gameState.timeRemaining === null) {
+      setGameState(p => ({...p, timeRemaining: p.timerSeconds}));
+    }
+
+    if (gameState.timeRemaining > 0) {
+      const timerId = setTimeout(() => {
+        setGameState(p => ({...p, timeRemaining: p.timeRemaining - 1}));
+      }, 1000);
+      return () => clearTimeout(timerId);
+    } else if (gameState.timeRemaining === 0) {
+        setGameState(prev => ({
+            ...prev,
+            answered: true,
+            feedback: `Temps écoulé ! La bonne réponse était : ${getCorrectAnswer(prev.questions[prev.currentQuestion])}`
+        }));
+        setTimeout(handleNextQuestion, 2000);
+    }
+  }, [screen, gameState.timeRemaining, gameState.timerSeconds, gameState.answered, handleNextQuestion, getCorrectAnswer, gameState.currentQuestion, gameState.questions]);
+
+
+  const renderGame = () => {
+    if (gameState.currentQuestion >= gameState.questions.length) {
+        return (
+            <div>
+                <h2 className="question-text">Partie terminée !</h2>
+                <div className="score-display">Score final : {gameState.score}/{gameState.questions.length}</div>
+                <button className="btn" onClick={() => startGame(gameState.type)}>Rejouer</button>
+                <button className="btn back-btn" onClick={showHub}>Retour au hub</button>
+            </div>
+        );
+    }
+
+    const q = gameState.questions[gameState.currentQuestion];
+
+    const handleQCMAnswer = (selectedIndex) => {
+        handleAnswer(selectedIndex === q.correct);
+    };
+
+    const handleVraiFauxAnswer = (answer) => {
+        handleAnswer(answer === q.correct);
+    };
+
+    const handleReconstitutionAnswer = () => {
+        const userAnswer = gameState.constructedSentence.map(item => item.word).join(' ');
+        const correctAnswer = q.correct.join(' ');
+        handleAnswer(userAnswer === correctAnswer);
+    }
+
+    const addWordToSentence = (word, index) => {
+      if (gameState.answered) return;
+      setGameState(prev => ({
+        ...prev,
+        constructedSentence: [...prev.constructedSentence, { word, index }],
+        shuffledWords: prev.shuffledWords.map((w, i) => i === index ? null : w).filter(Boolean),
+      }));
+    };
+    
+    const removeWordFromSentence = (word, index) => {
+        if (gameState.answered) return;
+        // This is a simplified version. A real implementation would need to handle multiple identical words.
+        setGameState(prev => ({
+          ...prev,
+          shuffledWords: [...prev.shuffledWords, word],
+          constructedSentence: prev.constructedSentence.filter((_, i) => i !== index)
+        }));
+    }
+
+    const GameHeader = () => (
+      <div className="score-display">
+        Score : {gameState.score}/{gameState.questions.length}
+        {gameState.timerSeconds && 
+          <span className={`timer-display ${gameState.timeRemaining <= 5 ? 'warning' : ''}`}>
+            ⏱️ {gameState.timeRemaining}s
+          </span>
+        }
+      </div>
+    );
+    
+    return (
+        <div>
+            <GameHeader />
+            {gameState.feedback && <div className={`feedback-message ${gameState.feedback.startsWith('Correct') ? 'feedback-correct' : 'feedback-incorrect'}`}>{gameState.feedback}</div>}
+            
+            {gameState.type === 'reconstitution' ? (
+                <>
+                    <div className="question-text">Reconstituez : "{q.french}"</div>
+                    <div className="sentence-construction">
+                        {gameState.constructedSentence.map((item, i) => 
+                            <span key={i} className="constructed-word" onClick={() => removeWordFromSentence(item.word, i)}>{item.word}</span>
+                        )}
+                    </div>
+                    <div className="word-bank">
+                        {gameState.shuffledWords.map((word, i) => (
+                           word && <button key={i} className="word-btn" onClick={() => addWordToSentence(word, i)} disabled={gameState.answered}>{word}</button>
+                        ))}
+                    </div>
+                    <button className="btn" onClick={handleReconstitutionAnswer} disabled={gameState.answered}>Vérifier</button>
+                </>
+            ) : gameState.type === 'vraifaux' ? (
+                 <>
+                    <div className="question-text">"{q.latin}" signifie "{q.french}"</div>
+                    <div className="options-grid">
+                        <button className={`option-btn ${gameState.answered && q.correct === true ? 'correct' : ''} ${gameState.answered && q.correct === false ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(true)} disabled={gameState.answered}>✅ Vrai</button>
+                        <button className={`option-btn ${gameState.answered && q.correct === false ? 'correct' : ''} ${gameState.answered && q.correct === true ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(false)} disabled={gameState.answered}>❌ Faux</button>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="question-text">{q.question}</div>
+                    <div className="options-grid">
+                        {q.options.map((option, index) => (
+                            <button key={index} className={`option-btn ${gameState.answered && index === q.correct ? 'correct' : ''}`} onClick={() => handleQCMAnswer(index)} disabled={gameState.answered}>{option}</button>
+                        ))}
+                    </div>
+                </>
+            )}
+            <button className="btn back-btn" onClick={showHub}>Quitter</button>
+        </div>
+    );
+  };
+  
+  const renderGameConfig = () => {
+    const handleConfigChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setGameConfig(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+    const title = `Configuration - ${gameState.type.charAt(0).toUpperCase() + gameState.type.slice(1)}`;
+
+    return (
+        <div>
+            <h2 className="question-text">{title}</h2>
+            <div className="config-section">
+                <h3>⏱️ Chronomètre par question :</h3>
+                <div className="timer-config" onChange={handleConfigChange}>
+                    <label className="timer-option"><input type="radio" name="timer" value="none" defaultChecked/><span>Pas de chronomètre</span></label>
+                    <label className="timer-option"><input type="radio" name="timer" value="10"/><span>10 secondes</span></label>
+                    <label className="timer-option"><input type="radio" name="timer" value="15"/><span>15 secondes</span></label>
+                    <label className="timer-option"><input type="radio" name="timer" value="25"/><span>25 secondes</span></label>
+                </div>
+            </div>
+            { /* Add specific configs for conjugaison, temps, reconstitution if needed */ }
+            <button className="btn" onClick={() => startConfiguredGame(gameState.type)}>Commencer le quiz</button>
+            <button className="btn back-btn" onClick={showHub}>Retour</button>
+        </div>
+    );
+  }
+
   const GameCard = ({ emoji, title, onClick }) => (
     <div className="game-card" onClick={onClick}>
       <div className="game-icon">{emoji}</div>
@@ -403,12 +825,12 @@ export default function LatinPlatformPage() {
             </div>
           )}
 
-          {screen === 'game' && (
+          {(screen === 'game-config' || screen === 'game') && (
              <div id="game-screen">
                 <div className="game-container">
                     <div id="game-content">
-                        <h2>Jeu: {currentGame}</h2>
-                        <button className="btn" onClick={() => setScreen('hub')}>Retour au hub</button>
+                       {screen === 'game-config' && renderGameConfig()}
+                       {screen === 'game' && renderGame()}
                     </div>
                 </div>
             </div>
@@ -419,3 +841,4 @@ export default function LatinPlatformPage() {
     </>
   );
 }
+
