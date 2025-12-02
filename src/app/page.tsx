@@ -912,7 +912,7 @@ export default function LatinPlatformPage() {
         <div className="content-wrapper">
           {screen === 'questionnaire' && (
             <div id="questionnaire-screen" className="card">
-              <h1 id="app-title">Apprentissage du Latin</h1>
+              <h1 id="app-title">BELLATIN</h1>
               <p className="subtitle" id="welcome-message">
                 Bienvenue ! Commencez par nous en dire un peu plus sur vous.
               </p>
