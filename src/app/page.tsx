@@ -319,8 +319,13 @@ const LatinAppStyles = () => (
       50% { transform: scale(1.05); }
     }
 
-    .timer-config, .config-section {
-      margin-bottom: 20px;
+    .config-section {
+        margin-bottom: 30px;
+    }
+
+    .timer-config, .checkbox-grid {
+        display: grid;
+        gap: 10px;
     }
 
     .timer-option, .checkbox-label {
@@ -337,7 +342,7 @@ const LatinAppStyles = () => (
       background: #e8e8e8;
     }
 
-    .timer-option input[type="radio"], .checkbox-label input {
+    .timer-option input[type="radio"], .checkbox-label input[type="checkbox"] {
       margin-right: 10px;
       width: 20px;
       height: 20px;
@@ -450,7 +455,6 @@ export default function LatinPlatformPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [gameState, setGameState] = useState(initialGameState);
-  const [gameConfig, setGameConfig] = useState({});
 
   const calculateProfile = (level, years) => {
     const score = (level * 2) + (years * 3);
@@ -506,11 +510,43 @@ export default function LatinPlatformPage() {
     let allQuestions = gameData[profil]?.[gameType] || [];
     let filteredQuestions = [...allQuestions];
     
-    const timerValue = parseInt(gameConfig.timer) || null;
+    const timerValue = parseInt(document.querySelector('input[name="timer"]:checked')?.value) || null;
 
+    if (gameType === 'conjugaison') {
+      const temps = {
+        present: document.getElementById('temps-present').checked,
+        imparfait: document.getElementById('temps-imparfait').checked,
+        parfait: document.getElementById('temps-parfait').checked,
+        futur: document.getElementById('temps-futur').checked,
+      };
+      const voix = {
+        actif: document.getElementById('voix-actif').checked,
+        passif: document.getElementById('voix-passif').checked,
+      };
+      filteredQuestions = allQuestions.filter(q => temps[q.temps] && voix[q.voix]);
+    } else if (gameType === 'temps') {
+        const temps = {
+            present: document.getElementById('id-present').checked,
+            imparfait: document.getElementById('id-imparfait').checked,
+            parfait: document.getElementById('id-parfait').checked,
+            futur: document.getElementById('id-futur').checked,
+            plusqueparfait: document.getElementById('id-plusqueparfait').checked,
+        };
+        filteredQuestions = allQuestions.filter(q => temps[q.temps]);
+    } else if (gameType === 'reconstitution') {
+        const declinaisons = {
+            nominatif: document.getElementById('decl-nominatif').checked,
+            accusatif: document.getElementById('decl-accusatif').checked,
+            genitif: document.getElementById('decl-genitif').checked,
+            datif: document.getElementById('decl-datif').checked,
+            ablatif: document.getElementById('decl-ablatif').checked,
+        };
+        filteredQuestions = allQuestions.filter(q => q.declinaisons.some(d => declinaisons[d]));
+    }
+    
     if (filteredQuestions.length === 0) {
-      alert("Aucune question disponible pour cette configuration.");
-      return;
+        alert("Aucune question disponible pour cette configuration. Veuillez sélectionner au moins une option.");
+        return;
     }
     
     const questions = [...filteredQuestions].sort(() => 0.5 - Math.random()).slice(0, 5);
@@ -547,53 +583,53 @@ export default function LatinPlatformPage() {
     });
   }, []);
 
-  const handleAnswer = (isCorrect) => {
+  const getCorrectAnswerText = (question, type) => {
+    if (!question) return '';
+    switch (type) {
+      case 'reconstitution':
+        return question.correct.join(' ');
+      case 'vraifaux':
+        return question.correct ? 'Vrai' : 'Faux';
+      default:
+        return question.options[question.correct];
+    }
+  };
+
+  const handleAnswer = useCallback((isCorrect) => {
       if (gameState.answered) return;
+
+      const currentQuestion = gameState.questions[gameState.currentQuestion];
+      const feedbackText = isCorrect
+          ? 'Correct !'
+          : `Incorrect. La bonne réponse était : ${getCorrectAnswerText(currentQuestion, gameState.type)}`;
+
       setGameState(prev => ({
           ...prev,
           answered: true,
           score: isCorrect ? prev.score + 1 : prev.score,
-          feedback: isCorrect ? 'Correct !' : `Incorrect. La bonne réponse était : ${getCorrectAnswer(prev.questions[prev.currentQuestion])}`,
+          feedback: feedbackText,
       }));
+
       setTimeout(handleNextQuestion, 2000);
-  };
-  
-  const getCorrectAnswer = (question) => {
-      if (!question) return '';
-      switch (gameState.type) {
-          case 'reconstitution':
-              return question.correct.join(' ');
-          case 'vraifaux':
-              return question.correct ? 'Vrai' : 'Faux';
-          default:
-              return question.options[question.correct];
-      }
-  }
+  }, [gameState.answered, gameState.questions, gameState.currentQuestion, gameState.type, handleNextQuestion]);
 
   useEffect(() => {
-    if (screen !== 'game' || !gameState.timerSeconds || gameState.answered) {
-      return;
-    }
-
-    if (gameState.timeRemaining === null) {
-      setGameState(p => ({...p, timeRemaining: p.timerSeconds}));
-    }
-
-    if (gameState.timeRemaining > 0) {
-      const timerId = setTimeout(() => {
-        setGameState(p => ({...p, timeRemaining: p.timeRemaining - 1}));
+    let timerId;
+    if (screen === 'game' && gameState.timerSeconds && !gameState.answered && gameState.timeRemaining > 0) {
+      timerId = setTimeout(() => {
+        setGameState(prev => ({ ...prev, timeRemaining: prev.timeRemaining - 1 }));
       }, 1000);
-      return () => clearTimeout(timerId);
-    } else if (gameState.timeRemaining === 0) {
-        setGameState(prev => ({
-            ...prev,
-            answered: true,
-            feedback: `Temps écoulé ! La bonne réponse était : ${getCorrectAnswer(prev.questions[prev.currentQuestion])}`
-        }));
-        setTimeout(handleNextQuestion, 2000);
+    } else if (gameState.timeRemaining === 0 && !gameState.answered) {
+      const currentQuestion = gameState.questions[gameState.currentQuestion];
+      setGameState(prev => ({
+        ...prev,
+        answered: true,
+        feedback: `Temps écoulé ! La bonne réponse était : ${getCorrectAnswerText(currentQuestion, gameState.type)}`
+      }));
+      setTimeout(handleNextQuestion, 2000);
     }
-  }, [screen, gameState.timeRemaining, gameState.timerSeconds, gameState.answered, handleNextQuestion, getCorrectAnswer, gameState.currentQuestion, gameState.questions]);
-
+    return () => clearTimeout(timerId);
+  }, [screen, gameState.timeRemaining, gameState.timerSeconds, gameState.answered, gameState.questions, gameState.currentQuestion, gameState.type, handleNextQuestion]);
 
   const renderGame = () => {
     if (gameState.currentQuestion >= gameState.questions.length) {
@@ -625,20 +661,28 @@ export default function LatinPlatformPage() {
 
     const addWordToSentence = (word, index) => {
       if (gameState.answered) return;
+      
+      const newShuffled = [...gameState.shuffledWords];
+      newShuffled.splice(index, 1);
+
       setGameState(prev => ({
         ...prev,
-        constructedSentence: [...prev.constructedSentence, { word, index }],
-        shuffledWords: prev.shuffledWords.map((w, i) => i === index ? null : w).filter(Boolean),
+        constructedSentence: [...prev.constructedSentence, { word, originalIndex: index }],
+        shuffledWords: newShuffled,
       }));
     };
     
-    const removeWordFromSentence = (word, index) => {
+    const removeWordFromSentence = (word, indexInSentence) => {
         if (gameState.answered) return;
-        // This is a simplified version. A real implementation would need to handle multiple identical words.
+        
+        const wordToRemove = gameState.constructedSentence[indexInSentence];
+        const newConstructed = gameState.constructedSentence.filter((_, i) => i !== indexInSentence);
+        const newShuffled = [...gameState.shuffledWords, wordToRemove.word];
+
         setGameState(prev => ({
           ...prev,
-          shuffledWords: [...prev.shuffledWords, word],
-          constructedSentence: prev.constructedSentence.filter((_, i) => i !== index)
+          shuffledWords: newShuffled,
+          constructedSentence: newConstructed
         }));
     }
 
@@ -646,7 +690,7 @@ export default function LatinPlatformPage() {
       <div className="score-display">
         Score : {gameState.score}/{gameState.questions.length}
         {gameState.timerSeconds && 
-          <span className={`timer-display ${gameState.timeRemaining <= 5 ? 'warning' : ''}`}>
+          <span className={`timer-display ${gameState.timeRemaining <= 5 && gameState.timeRemaining > 0 ? 'warning' : ''}`}>
             ⏱️ {gameState.timeRemaining}s
           </span>
         }
@@ -677,16 +721,21 @@ export default function LatinPlatformPage() {
                  <>
                     <div className="question-text">"{q.latin}" signifie "{q.french}"</div>
                     <div className="options-grid">
-                        <button className={`option-btn ${gameState.answered && q.correct === true ? 'correct' : ''} ${gameState.answered && q.correct === false ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(true)} disabled={gameState.answered}>✅ Vrai</button>
-                        <button className={`option-btn ${gameState.answered && q.correct === false ? 'correct' : ''} ${gameState.answered && q.correct === true ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(false)} disabled={gameState.answered}>❌ Faux</button>
+                        <button className={`option-btn ${gameState.answered && q.correct === true ? 'correct' : ''} ${gameState.answered && q.correct === false && true ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(true)} disabled={gameState.answered}>✅ Vrai</button>
+                        <button className={`option-btn ${gameState.answered && q.correct === false ? 'correct' : ''} ${gameState.answered && q.correct === true && false ? 'incorrect' : ''}`} onClick={() => handleVraiFauxAnswer(false)} disabled={gameState.answered}>❌ Faux</button>
                     </div>
                 </>
-            ) : (
+            ) : ( // Covers all QCM types
                 <>
                     <div className="question-text">{q.question}</div>
                     <div className="options-grid">
                         {q.options.map((option, index) => (
-                            <button key={index} className={`option-btn ${gameState.answered && index === q.correct ? 'correct' : ''}`} onClick={() => handleQCMAnswer(index)} disabled={gameState.answered}>{option}</button>
+                            <button key={index} 
+                              className={`option-btn ${gameState.answered ? (index === q.correct ? 'correct' : '') : ''}`} 
+                              onClick={() => handleQCMAnswer(index)} 
+                              disabled={gameState.answered}>
+                                {option}
+                            </button>
                         ))}
                     </div>
                 </>
@@ -697,28 +746,76 @@ export default function LatinPlatformPage() {
   };
   
   const renderGameConfig = () => {
-    const handleConfigChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setGameConfig(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
     const title = `Configuration - ${gameState.type.charAt(0).toUpperCase() + gameState.type.slice(1)}`;
+
+    const timerConfig = (
+        <div className="config-section">
+            <h3>⏱️ Chronomètre par question :</h3>
+            <div className="timer-config">
+                <label className="timer-option"><input type="radio" name="timer" value="none" defaultChecked/><span>Pas de chronomètre</span></label>
+                <label className="timer-option"><input type="radio" name="timer" value="10"/><span>10 secondes</span></label>
+                <label className="timer-option"><input type="radio" name="timer" value="15"/><span>15 secondes</span></label>
+                <label className="timer-option"><input type="radio" name="timer" value="25"/><span>25 secondes</span></label>
+            </div>
+        </div>
+    );
+
+    let specificConfig = null;
+
+    if (gameState.type === 'conjugaison') {
+        specificConfig = (
+            <>
+                <div className="config-section">
+                    <h3>Temps à inclure :</h3>
+                    <div className="checkbox-grid">
+                        <label className="checkbox-label"><input type="checkbox" id="temps-present" defaultChecked/><span>Présent</span></label>
+                        <label className="checkbox-label"><input type="checkbox" id="temps-imparfait" defaultChecked/><span>Imparfait</span></label>
+                        <label className="checkbox-label"><input type="checkbox" id="temps-parfait" defaultChecked/><span>Parfait</span></label>
+                        <label className="checkbox-label"><input type="checkbox" id="temps-futur" defaultChecked/><span>Futur</span></label>
+                    </div>
+                </div>
+                <div className="config-section">
+                    <h3>Voix à inclure :</h3>
+                    <div className="checkbox-grid">
+                        <label className="checkbox-label"><input type="checkbox" id="voix-actif" defaultChecked/><span>Actif</span></label>
+                        <label className="checkbox-label"><input type="checkbox" id="voix-passif" defaultChecked/><span>Passif</span></label>
+                    </div>
+                </div>
+            </>
+        );
+    } else if (gameState.type === 'temps') {
+        specificConfig = (
+             <div className="config-section">
+                <h3>Temps à identifier :</h3>
+                <div className="checkbox-grid">
+                  <label className="checkbox-label"><input type="checkbox" id="id-present" defaultChecked/><span>Présent</span></label>
+                  <label className="checkbox-label"><input type="checkbox" id="id-imparfait" defaultChecked/><span>Imparfait</span></label>
+                  <label className="checkbox-label"><input type="checkbox" id="id-parfait" defaultChecked/><span>Parfait</span></label>
+                  <label className="checkbox-label"><input type="checkbox" id="id-futur" defaultChecked/><span>Futur</span></label>
+                  <label className="checkbox-label"><input type="checkbox" id="id-plusqueparfait" defaultChecked/><span>Plus-que-parfait</span></label>
+                </div>
+            </div>
+        );
+    } else if (gameState.type === 'reconstitution') {
+         specificConfig = (
+             <div className="config-section">
+                <h3>Déclinaisons à inclure :</h3>
+                <div className="checkbox-grid">
+                    <label className="checkbox-label"><input type="checkbox" id="decl-nominatif" defaultChecked/><span>Nominatif</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-accusatif" defaultChecked/><span>Accusatif</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-genitif" defaultChecked/><span>Génitif</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-datif" defaultChecked/><span>Datif</span></label>
+                    <label className="checkbox-label"><input type="checkbox" id="decl-ablatif" defaultChecked/><span>Ablatif</span></label>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
             <h2 className="question-text">{title}</h2>
-            <div className="config-section">
-                <h3>⏱️ Chronomètre par question :</h3>
-                <div className="timer-config" onChange={handleConfigChange}>
-                    <label className="timer-option"><input type="radio" name="timer" value="none" defaultChecked/><span>Pas de chronomètre</span></label>
-                    <label className="timer-option"><input type="radio" name="timer" value="10"/><span>10 secondes</span></label>
-                    <label className="timer-option"><input type="radio" name="timer" value="15"/><span>15 secondes</span></label>
-                    <label className="timer-option"><input type="radio" name="timer" value="25"/><span>25 secondes</span></label>
-                </div>
-            </div>
-            { /* Add specific configs for conjugaison, temps, reconstitution if needed */ }
+            {timerConfig}
+            {specificConfig}
             <button className="btn" onClick={() => startConfiguredGame(gameState.type)}>Commencer le quiz</button>
             <button className="btn back-btn" onClick={showHub}>Retour</button>
         </div>
@@ -841,4 +938,3 @@ export default function LatinPlatformPage() {
     </>
   );
 }
-
