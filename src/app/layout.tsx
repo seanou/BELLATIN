@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'BELLATIN',
@@ -25,6 +26,10 @@ export default function RootLayout({
       <body>
         {children}
         <Toaster />
+        <Script 
+          src="https://cdn.jotfor.ms/agent/embedjs/019cd93d556b76dd8ca0dbe8be6e170e89fb/embed.js" 
+          strategy="afterInteractive" 
+        />
       </body>
     </html>
   );

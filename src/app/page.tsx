@@ -461,7 +461,7 @@ const LatinAppStyles = () => (
     .app-footer {
       position: fixed;
       bottom: 15px;
-      right: 20px;
+      left: 20px;
       color: white;
       font-size: 12px;
       font-family: 'Segoe UI', sans-serif;
