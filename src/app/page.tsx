@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -461,7 +460,7 @@ const LatinAppStyles = () => (
     .app-footer {
       position: fixed;
       bottom: 15px;
-      left: 20px;
+      right: 20px;
       color: white;
       font-size: 12px;
       font-family: 'Segoe UI', sans-serif;
